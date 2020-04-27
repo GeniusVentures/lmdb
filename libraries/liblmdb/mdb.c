@@ -43,6 +43,41 @@
 #include <windows.h>
 #include <wchar.h>				/* get wcscpy() */
 
+/* We use native NT APIs to setup the memory map, so that we can
+ * let the DB file grow incrementally instead of always preallocating
+ * the full size. These APIs are defined in <wdm.h> and <ntifs.h>
+ * but those headers are meant for driver-level development and
+ * conflict with the regular user-level headers, so we explicitly
+ * declare them here. We get pointers to these functions from
+ * NTDLL.DLL at runtime, to avoid buildtime dependencies on any
+ * NTDLL import libraries.
+ */
+typedef NTSTATUS (WINAPI NtCreateSectionFunc)
+  (OUT PHANDLE sh, IN ACCESS_MASK acc,
+  IN void * oa OPTIONAL,
+  IN PLARGE_INTEGER ms OPTIONAL,
+  IN ULONG pp, IN ULONG aa, IN HANDLE fh OPTIONAL);
+
+static NtCreateSectionFunc *NtCreateSection;
+
+typedef enum _SECTION_INHERIT {
+	ViewShare = 1,
+	ViewUnmap = 2
+} SECTION_INHERIT;
+
+typedef NTSTATUS (WINAPI NtMapViewOfSectionFunc)
+  (IN PHANDLE sh, IN HANDLE ph,
+  IN OUT PVOID *addr, IN ULONG_PTR zbits,
+  IN SIZE_T cs, IN OUT PLARGE_INTEGER off OPTIONAL,
+  IN OUT PSIZE_T vs, IN SECTION_INHERIT ih,
+  IN ULONG at, IN ULONG pp);
+
+static NtMapViewOfSectionFunc *NtMapViewOfSection;
+
+typedef NTSTATUS (WINAPI NtCloseFunc)(HANDLE h);
+
+static NtCloseFunc *NtClose;
+
 /** getpid() returns int; MinGW defines pid_t but MinGW64 typedefs it
  *  as int64 which is wrong. MSVC doesn't define it at all, so just
  *  don't use it.
@@ -61,6 +96,7 @@
 #  define SSIZE_MAX	INT_MAX
 # endif
 #endif
+#define MDB_OFF_T	int64_t
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -73,6 +109,7 @@
 #include <sys/file.h>
 #endif
 #include <fcntl.h>
+#define MDB_OFF_T	off_t
 #endif
 
 #if defined(__mips) && defined(__linux)
