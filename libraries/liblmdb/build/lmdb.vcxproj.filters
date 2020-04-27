@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="D:\03_TASK\01_blockchain\03-GNUS\work\lmdb\libraries\liblmdb\mdb.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\03_TASK\01_blockchain\03-GNUS\work\lmdb\libraries\liblmdb\midl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="D:\03_TASK\01_blockchain\03-GNUS\work\lmdb\libraries\liblmdb\lmdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="D:\03_TASK\01_blockchain\03-GNUS\work\lmdb\libraries\liblmdb\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A403ACB8-B59B-369D-B88A-E18059441B47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{C5CEF220-C8CA-3EB0-8BA0-E75EF5EEAFE0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
