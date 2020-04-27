@@ -1106,7 +1106,7 @@ typedef struct MDB_db {
 	pgno_t		md_branch_pages;	/**< number of internal pages */
 	pgno_t		md_leaf_pages;		/**< number of leaf pages */
 	pgno_t		md_overflow_pages;	/**< number of overflow pages */
-	size_t		md_entries;		/**< number of data items */
+	mdb_size_t	md_entries;		/**< number of data items */
 	pgno_t		md_root;		/**< the root page of this tree */
 } MDB_db;
 
@@ -1145,7 +1145,7 @@ typedef struct MDB_meta {
 #else
 	void		*mm_address;		/**< address for fixed mapping */
 #endif
-	size_t		mm_mapsize;			/**< size of mmap region */
+	mdb_size_t	mm_mapsize;			/**< size of mmap region */
 	MDB_db		mm_dbs[CORE_DBS];	/**< first is free space, 2nd is main db */
 	/** The size of pages used in this DB */
 #define	mm_psize	mm_dbs[FREE_DBI].md_pad
@@ -1419,8 +1419,8 @@ struct MDB_env {
 	void		*me_pbuf;		/**< scratch area for DUPSORT put() */
 	MDB_txn		*me_txn;		/**< current write transaction */
 	MDB_txn		*me_txn0;		/**< prealloc'd write transaction */
-	size_t		me_mapsize;		/**< size of the data memory map */
-	off_t		me_size;		/**< current file size */
+	mdb_size_t	me_mapsize;		/**< size of the data memory map */
+	MDB_OFF_T	me_size;		/**< current file size */
 	pgno_t		me_maxpg;		/**< me_mapsize / me_psize */
 	MDB_dbx		*me_dbxs;		/**< array of static DB info */
 	uint16_t	*me_dbflags;	/**< array of flags from MDB_db.md_flags */
@@ -1571,12 +1571,17 @@ static int mdb_reader_check0(MDB_env *env, int rlocked, int *dead);
 static MDB_cmp_func	mdb_cmp_memn, mdb_cmp_memnr, mdb_cmp_int, mdb_cmp_cint, mdb_cmp_long;
 /** @endcond */
 
-/** Compare two items pointing at size_t's of unknown alignment. */
+/** Compare two items pointing at '#mdb_size_t's of unknown alignment. */
 #ifdef MISALIGNED_OK
 # define mdb_cmp_clong mdb_cmp_long
 #else
 # define mdb_cmp_clong mdb_cmp_cint
 #endif
+
+/** True if we need #mdb_cmp_clong() instead of \b cmp for #MDB_INTEGERDUP */
+#define NEED_CMP_CLONG(cmp, ksize) \
+	(UINT_MAX < MDB_SIZE_MAX && \
+	 (cmp) == mdb_cmp_int && (ksize) == sizeof(mdb_size_t))
 
 #ifdef _WIN32
 static SECURITY_DESCRIPTOR mdb_null_sd;
@@ -3161,7 +3166,7 @@ mdb_txn_env(MDB_txn *txn)
 	return txn->mt_env;
 }
 
-size_t
+mdb_size_t
 mdb_txn_id(MDB_txn *txn)
 {
     if(!txn) return 0;
@@ -4090,8 +4095,8 @@ mdb_env_write_meta(MDB_txn *txn)
 	MDB_env *env;
 	MDB_meta	meta, metab, *mp;
 	unsigned flags;
-	size_t mapsize;
-	off_t off;
+	mdb_size_t mapsize;
+	MDB_OFF_T off;
 	int rc, len, toggle;
 	char *ptr;
 	HANDLE mfd;
@@ -4356,7 +4361,7 @@ mdb_env_map(MDB_env *env, void *addr)
 }
 
 int ESECT
-mdb_env_set_mapsize(MDB_env *env, size_t size)
+mdb_env_set_mapsize(MDB_env *env, mdb_size_t size)
 {
 	/* If env is already open, caller is responsible for making
 	 * sure there are no active txns.
@@ -4374,7 +4379,7 @@ mdb_env_set_mapsize(MDB_env *env, size_t size)
 			size = meta->mm_mapsize;
 		{
 			/* Silently round up to minimum if the size is too small */
-			size_t minsize = (meta->mm_last_pg + 1) * env->me_psize;
+			mdb_size_t minsize = (meta->mm_last_pg + 1) * env->me_psize;
 			if (size < minsize)
 				size = minsize;
 		}
@@ -4424,7 +4429,7 @@ mdb_env_get_maxreaders(MDB_env *env, unsigned int *readers)
 }
 
 static int ESECT
-mdb_fsize(HANDLE fd, size_t *size)
+mdb_fsize(HANDLE fd, mdb_size_t *size)
 {
 #ifdef _WIN32
 	LARGE_INTEGER fsize;
@@ -4721,7 +4726,7 @@ mdb_env_open2(MDB_env *env)
 		/* Make sure mapsize >= committed data size.  Even when using
 		 * mm_mapsize, which could be broken in old files (ITS#7789).
 		 */
-		size_t minsize = (meta.mm_last_pg + 1) * meta.mm_psize;
+		mdb_size_t minsize = (meta.mm_last_pg + 1) * meta.mm_psize;
 		if (env->me_mapsize < minsize)
 			env->me_mapsize = minsize;
 	}
@@ -5596,18 +5601,18 @@ mdb_env_close(MDB_env *env)
 	free(env);
 }
 
-/** Compare two items pointing at aligned size_t's */
+/** Compare two items pointing at aligned #mdb_size_t's */
 static int
 mdb_cmp_long(const MDB_val *a, const MDB_val *b)
 {
-	return (*(size_t *)a->mv_data < *(size_t *)b->mv_data) ? -1 :
-		*(size_t *)a->mv_data > *(size_t *)b->mv_data;
+	return (*(mdb_size_t *)a->mv_data < *(mdb_size_t *)b->mv_data) ? -1 :
+		*(mdb_size_t *)a->mv_data > *(mdb_size_t *)b->mv_data;
 }
 
 /** Compare two items pointing at aligned unsigned int's.
  *
  *	This is also set as #MDB_INTEGERDUP|#MDB_DUPFIXED's #MDB_dbx.%md_dcmp,
- *	but #mdb_cmp_clong() is called instead if the data type is size_t.
+ *	but #mdb_cmp_clong() is called instead if the data type is #mdb_size_t.
  */
 static int
 mdb_cmp_int(const MDB_val *a, const MDB_val *b)
@@ -5724,7 +5729,7 @@ mdb_node_search(MDB_cursor *mc, MDB_val *key, int *exactp)
 	 * alignment is guaranteed. Use faster mdb_cmp_int.
 	 */
 	if (cmp == mdb_cmp_cint && IS_BRANCH(mp)) {
-		if (NODEPTR(mp, 1)->mn_ksize == sizeof(size_t))
+		if (NODEPTR(mp, 1)->mn_ksize == sizeof(mdb_size_t))
 			cmp = mdb_cmp_long;
 		else
 			cmp = mdb_cmp_int;
@@ -7730,7 +7735,7 @@ new_sub:
 		 */
 		if (do_sub) {
 			int xflags, new_dupdata;
-			size_t ecount;
+			mdb_size_t ecount;
 put_sub:
 			xdata.mv_size = 0;
 			xdata.mv_data = "";
@@ -8432,7 +8437,7 @@ mdb_cursor_renew(MDB_txn *txn, MDB_cursor *mc)
 
 /* Return the count of duplicate data items for the current key */
 int
-mdb_cursor_count(MDB_cursor *mc, size_t *countp)
+mdb_cursor_count(MDB_cursor *mc, mdb_size_t *countp)
 {
 	MDB_node	*leaf;
 
@@ -10201,7 +10206,7 @@ mdb_env_copyfd0(MDB_env *env, HANDLE fd)
 	MDB_txn *txn = NULL;
 	mdb_mutexref_t wmutex = NULL;
 	int rc;
-	size_t wsize, w3;
+	mdb_size_t wsize, w3;
 	char *ptr;
 #ifdef _WIN32
 	DWORD len, w2;
@@ -10262,7 +10267,7 @@ mdb_env_copyfd0(MDB_env *env, HANDLE fd)
 
 	w3 = txn->mt_next_pgno * env->me_psize;
 	{
-		size_t fsize = 0;
+		mdb_size_t fsize = 0;
 		if ((rc = mdb_fsize(env->me_fd, &fsize)))
 			goto leave;
 		if (w3 > fsize)
