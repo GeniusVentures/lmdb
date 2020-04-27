@@ -162,9 +162,11 @@ typedef SSIZE_T	ssize_t;
 #endif
 
 #if defined(__APPLE__) || defined (BSD) || defined(__FreeBSD_kernel__)
-# define MDB_USE_POSIX_SEM	1
+# if !(defined(MDB_USE_POSIX_MUTEX) || defined(MDB_USE_POSIX_SEM))
+# define MDB_USE_SYSV_SEM	1
+# endif
 # define MDB_FDATASYNC		fsync
-#elif defined(ANDROID)
+#elif defined(__ANDROID__)
 # define MDB_FDATASYNC		fsync
 #endif
 
@@ -876,9 +878,47 @@ typedef struct MDB_txninfo {
 	/** Lockfile format signature: version, features and field layout */
 #define MDB_LOCK_FORMAT \
 	((uint32_t) \
-	 ((MDB_LOCK_VERSION) \
-	  /* Flags which describe functionality */ \
-	  + (((MDB_PIDLOCK) != 0) << 16)))
+#ifdef _WIN32
+# define MDB_LOCK_TYPE	(0 + ALIGNOF2(mdb_hash_t)/8 % 2)
+#elif defined MDB_USE_POSIX_SEM
+# define MDB_LOCK_TYPE	(4 + ALIGNOF2(mdb_hash_t)/8 % 2)
+#elif defined MDB_USE_SYSV_SEM
+# define MDB_LOCK_TYPE	(8)
+#elif defined MDB_USE_POSIX_MUTEX
+/* We do not know the inside of a POSIX mutex and how to check if mutexes
+ * used by two executables are compatible. Just check alignment and size.
+ */
+# define MDB_LOCK_TYPE	(10 + \
+		LOG2_MOD(ALIGNOF2(pthread_mutex_t), 5) + \
+		sizeof(pthread_mutex_t) / 4U % 22 * 5)
+#endif
+
+enum {
+	/** Magic number for lockfile layout and features.
+	 *
+	 *  This *attempts* to stop liblmdb variants compiled with conflicting
+	 *	options from using the lockfile at the same time and thus breaking
+	 *	it.  It describes locking types, and sizes and sometimes alignment
+	 *	of the various lockfile items.
+	 *
+	 *	The detected ranges are mostly guesswork, or based simply on how
+	 *	big they could be without using more bits.  So we can tweak them
+	 *	in good conscience when updating #MDB_LOCK_VERSION.
+	 */
+	MDB_lock_desc =
+	/* Default CACHELINE=64 vs. other values (have seen mention of 32-256) */
+	(CACHELINE==64 ? 0 : 1 + LOG2_MOD(CACHELINE >> (CACHELINE>64), 5))
+	+ 6  * (sizeof(MDB_PID_T)/4 % 3)    /* legacy(2) to word(4/8)? */
+	+ 18 * (sizeof(pthread_t)/4 % 5)    /* can be struct{id, active data} */
+	+ 90 * (sizeof(MDB_txbody) / CACHELINE % 3)
+	+ 270 * (MDB_LOCK_TYPE % 120)
+	/* The above is < 270*120 < 2**15 */
+	+ ((sizeof(txnid_t) == 8) << 15)    /* 32bit/64bit */
+	+ ((sizeof(MDB_reader) > CACHELINE) << 16)
+	/* Not really needed - implied by MDB_LOCK_TYPE != (_WIN32 locking) */
+	+ (((MDB_PIDLOCK) != 0)   << 17)
+	/* 18 bits total: Must be <= (32 - MDB_LOCK_VERSION_BITS). */
+};
 /** @} */
 
 /** Common header for all page types. The page type depends on #mp_flags.
@@ -1445,6 +1485,8 @@ struct MDB_env {
 	int		me_live_reader;		/**< have liveness lock in reader table */
 #ifdef _WIN32
 	int		me_pidquery;		/**< Used in OpenProcess */
+	OVERLAPPED	*ov;			/**< Used for for overlapping I/O requests */
+	int		ovs;				/**< Count of OVERLAPPEDs */
 #endif
 #ifdef MDB_USE_POSIX_MUTEX	/* Posix mutexes reside in shared mem */
 #	define		me_rmutex	me_txns->mti_rmutex /**< Shared reader lock */
@@ -2319,12 +2361,16 @@ mdb_page_dirty(MDB_txn *txn, MDB_page *mp)
 {
 	MDB_ID2 mid;
 	int rc, (*insert)(MDB_ID2L, MDB_ID2 *);
-
-	if (txn->mt_flags & MDB_TXN_WRITEMAP) {
+#ifdef _WIN32	/* With Windows we always write dirty pages with WriteFile,
+				 * so we always want them ordered */
+	insert = mdb_mid2l_insert;
+#else			/* but otherwise with writemaps, we just use msync, we
+				 * don't need the ordering and just append */
+	if (txn->mt_flags & MDB_TXN_WRITEMAP)
 		insert = mdb_mid2l_append;
-	} else {
+	else
 		insert = mdb_mid2l_insert;
-	}
+#endif
 	mid.mid = mp->mp_pgno;
 	mid.mptr = mp;
 	rc = insert(txn->mt_u.dirty_list, &mid);
@@ -2722,16 +2768,20 @@ fail:
 }
 
 int
-mdb_env_sync(MDB_env *env, int force)
+mdb_env_sync0(MDB_env *env, int force, pgno_t numpgs)
 {
 	int rc = 0;
 	if (env->me_flags & MDB_RDONLY)
 		return EACCES;
-	if (force || !F_ISSET(env->me_flags, MDB_NOSYNC)) {
+	if (force
+#ifndef _WIN32	/* Sync is normally achieved in Windows by doing WRITE_THROUGH writes */
+		|| !(env->me_flags & MDB_NOSYNC)
+#endif
+		) {
 		if (env->me_flags & MDB_WRITEMAP) {
 			int flags = ((env->me_flags & MDB_MAPASYNC) && !force)
 				? MS_ASYNC : MS_SYNC;
-			if (MDB_MSYNC(env->me_map, env->me_mapsize, flags))
+			if (MDB_MSYNC(env->me_map, env->me_psize * numpgs, flags))
 				rc = ErrCode();
 #ifdef _WIN32
 			else if (flags == MS_SYNC && MDB_FDATASYNC(env->me_fd))
@@ -2749,6 +2799,13 @@ mdb_env_sync(MDB_env *env, int force)
 		}
 	}
 	return rc;
+}
+
+int
+mdb_env_sync(MDB_env *env, int force)
+{
+	MDB_meta *m = mdb_env_pick_meta(env);
+	return mdb_env_sync0(env, force, m->mm_last_pg+1);
 }
 
 /** Back up parent txn's cursors, then grab the originals for tracking */
@@ -3568,14 +3625,21 @@ mdb_page_flush(MDB_txn *txn, int keep)
 	OVERLAPPED	ov;
 #else
 	struct iovec iov[MDB_COMMIT_PAGES];
-	ssize_t		wpos = 0, wsize = 0, wres;
-	size_t		next_pos = 1; /* impossible pos, so pos != next_pos */
+	HANDLE fd = env->me_fd;
+#endif
+	ssize_t		wsize = 0, wres;
+	MDB_OFF_T	wpos = 0, next_pos = 1; /* impossible pos, so pos != next_pos */
 	int			n = 0;
 #endif
 
 	j = i = keep;
-
-	if (env->me_flags & MDB_WRITEMAP) {
+	if (env->me_flags & MDB_WRITEMAP
+#ifdef _WIN32
+		/* In windows, we still do writes to the file (with write-through enabled in sync mode),
+		 * as this is faster than FlushViewOfFile/FlushFileBuffers */
+		&& (env->me_flags & MDB_NOSYNC)
+#endif
+		) {
 		/* Clear dirty flags */
 		while (++i <= pagecount) {
 			dp = dl[i].mptr;
@@ -3589,6 +3653,27 @@ mdb_page_flush(MDB_txn *txn, int keep)
 		}
 		goto done;
 	}
+
+#ifdef _WIN32
+	if (pagecount - keep >= env->ovs) {
+		/* ran out of room in ov array, and re-malloc, copy handles and free previous */
+		int ovs = (pagecount - keep) * 1.5; /* provide extra padding to reduce number of re-allocations */
+		int new_size = ovs * sizeof(OVERLAPPED);
+		ov = malloc(new_size);
+		if (ov == NULL)
+			return ENOMEM;
+		int previous_size = env->ovs * sizeof(OVERLAPPED);
+		memcpy(ov, env->ov, previous_size); /* Copy previous OVERLAPPED data to retain event handles */
+		/* And clear rest of memory */
+		memset(&ov[env->ovs], 0, new_size - previous_size);
+		if (env->ovs > 0) {
+			free(env->ov); /* release previous allocation */
+		}
+
+		env->ov = ov;
+		env->ovs = ovs;
+	}
+#endif
 
 	/* Write the pages */
 	for (;;) {
@@ -3608,45 +3693,62 @@ mdb_page_flush(MDB_txn *txn, int keep)
 			if (IS_OVERFLOW(dp)) size *= dp->mp_pages;
 		}
 #ifdef _WIN32
-		else break;
-
-		/* Windows actually supports scatter/gather I/O, but only on
-		 * unbuffered file handles. Since we're relying on the OS page
-		 * cache for all our data, that's self-defeating. So we just
-		 * write pages one at a time. We use the ov structure to set
-		 * the write offset, to at least save the overhead of a Seek
-		 * system call.
-		 */
-		DPRINTF(("committing page %"Z"u", pgno));
-		memset(&ov, 0, sizeof(ov));
-		ov.Offset = pos & 0xffffffff;
-		ov.OffsetHigh = pos >> 16 >> 16;
-		if (!WriteFile(env->me_fd, dp, size, NULL, &ov)) {
-			rc = ErrCode();
-			DPRINTF(("WriteFile: %d", rc));
-			return rc;
-		}
-#else
-		/* Write up to MDB_COMMIT_PAGES dirty pages at a time. */
-		if (pos!=next_pos || n==MDB_COMMIT_PAGES || wsize+size>MAX_WRITE) {
+			/* If writemap is enabled, consecutive page positions infer
+			 * contiguous (mapped) memory.
+			 * Otherwise force write pages one at a time.
+			 * Windows actually supports scatter/gather I/O, but only on
+			 * unbuffered file handles. Since we're relying on the OS page
+			 * cache for all our data, that's self-defeating. So we just
+			 * write pages one at a time. We use the ov structure to set
+			 * the write offset, to at least save the overhead of a Seek
+			 * system call.
+			 */
+			|| !(env->me_flags & MDB_WRITEMAP)
+#endif
+			) {
 			if (n) {
 retry_write:
 				/* Write previous page(s) */
+				DPRINTF(("committing page %"Z"u", pgno));
+#ifdef _WIN32
+				OVERLAPPED *this_ov = &ov[async_i];
+				/* Clear status, and keep hEvent, we reuse that */
+				this_ov->Internal = 0;
+				this_ov->Offset = wpos & 0xffffffff;
+				this_ov->OffsetHigh = wpos >> 16 >> 16;
+				if (!F_ISSET(env->me_flags, MDB_NOSYNC) && !this_ov->hEvent) {
+					HANDLE event = CreateEvent(NULL, FALSE, FALSE, NULL);
+					if (!event) {
+						rc = ErrCode();
+						DPRINTF(("CreateEvent: %s", strerror(rc)));
+						return rc;
+					}
+					this_ov->hEvent = event;
+				}
+				if (!WriteFile(fd, wdp, wsize, NULL, this_ov)) {
+					rc = ErrCode();
+					if (rc != ERROR_IO_PENDING) {
+						DPRINTF(("WriteFile: %d", rc));
+						return rc;
+					}
+				}
+				async_i++;
+#else
 #ifdef MDB_USE_PWRITEV
-				wres = pwritev(env->me_fd, iov, n, wpos);
+				wres = pwritev(fd, iov, n, wpos);
 #else
 				if (n == 1) {
-					wres = pwrite(env->me_fd, iov[0].iov_base, wsize, wpos);
+					wres = pwrite(fd, iov[0].iov_base, wsize, wpos);
 				} else {
 retry_seek:
-					if (lseek(env->me_fd, wpos, SEEK_SET) == -1) {
+					if (lseek(fd, wpos, SEEK_SET) == -1) {
 						rc = ErrCode();
 						if (rc == EINTR)
 							goto retry_seek;
 						DPRINTF(("lseek: %s", strerror(rc)));
 						return rc;
 					}
-					wres = writev(env->me_fd, iov, n);
+					wres = writev(fd, iov, n);
 				}
 #endif
 				if (wres != wsize) {
@@ -3661,19 +3763,26 @@ retry_seek:
 					}
 					return rc;
 				}
+#endif /* _WIN32 */
 				n = 0;
 			}
 			if (i > pagecount)
 				break;
 			wpos = pos;
 			wsize = 0;
+#ifdef _WIN32
+			wdp = dp;
 		}
-		DPRINTF(("committing page %"Z"u", pgno));
-		next_pos = pos + size;
+#else
+		}
 		iov[n].iov_len = size;
 		iov[n].iov_base = (char *)dp;
+#endif	/* _WIN32 */
+		DPRINTF(("committing page %"Yu, pgno));
+		next_pos = pos + size;
 		wsize += size;
 		n++;
+	}
 #ifdef MDB_VL32
 	if (pgno > txn->mt_last_pgno)
 		txn->mt_last_pgno = pgno;
@@ -4118,6 +4227,7 @@ mdb_env_write_meta(MDB_txn *txn)
 	if (mapsize < env->me_mapsize)
 		mapsize = env->me_mapsize;
 
+#ifndef _WIN32 /* We don't want to ever use MSYNC/FlushViewOfFile in Windows */
 	if (flags & MDB_WRITEMAP) {
 		mp->mm_mapsize = mapsize;
 		mp->mm_dbs[FREE_DBI] = txn->mt_dbs[FREE_DBI];
@@ -4133,11 +4243,10 @@ mdb_env_write_meta(MDB_txn *txn)
 			unsigned meta_size = env->me_psize;
 			rc = (env->me_flags & MDB_MAPASYNC) ? MS_ASYNC : MS_SYNC;
 			ptr = (char *)mp - PAGEHDRSZ;
-#ifndef _WIN32	/* POSIX msync() requires ptr = start of OS page */
+			/* POSIX msync() requires ptr = start of OS page */
 			r2 = (ptr - env->me_map) & (env->me_os_psize - 1);
 			ptr -= r2;
 			meta_size += r2;
-#endif
 			if (MDB_MSYNC(ptr, meta_size, rc)) {
 				rc = ErrCode();
 				goto fail;
@@ -4254,6 +4363,19 @@ mdb_env_create(MDB_env **env)
 	return MDB_SUCCESS;
 }
 
+#ifdef _WIN32
+/** @brief Map a result from an NTAPI call to WIN32. */
+static DWORD
+mdb_nt2win32(NTSTATUS st)
+{
+	OVERLAPPED o = {0};
+	DWORD br;
+	o.Internal = st;
+	GetOverlappedResult(NULL, &o, &br, FALSE);
+	return GetLastError();
+}
+#endif
+
 static int ESECT
 mdb_env_map(MDB_env *env, void *addr)
 {
@@ -4352,6 +4474,7 @@ mdb_env_map(MDB_env *env, void *addr)
 	 */
 	if (addr && env->me_map != addr)
 		return EBUSY;	/* TODO: Make a new MDB_* error code? */
+#endif
 
 	p = (MDB_page *)env->me_map;
 	env->me_metas[0] = METADATA(p);
