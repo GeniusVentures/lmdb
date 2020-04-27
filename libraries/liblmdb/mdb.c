@@ -174,12 +174,22 @@ typedef SSIZE_T	ssize_t;
 #ifdef MDB_USE_POSIX_SEM
 # define MDB_USE_HASH		1
 #include <semaphore.h>
+#elif defined(MDB_USE_SYSV_SEM)
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#ifdef _SEM_SEMUN_UNDEFINED
+union semun {
+	int val;
+	struct semid_ds *buf;
+	unsigned short *array;
+};
+#endif /* _SEM_SEMUN_UNDEFINED */
 #else
 #define MDB_USE_POSIX_MUTEX	1
-#endif
-#endif
+#endif /* MDB_USE_POSIX_SEM */
+#endif /* !_WIN32 */
 
-#if defined(_WIN32) + defined(MDB_USE_POSIX_SEM) \
+#if defined(_WIN32) + defined(MDB_USE_POSIX_SEM) + defined(MDB_USE_SYSV_SEM) \
 	+ defined(MDB_USE_POSIX_MUTEX) != 1
 # error "Ambiguous shared-lock implementation"
 #endif
@@ -281,6 +291,8 @@ typedef SSIZE_T	ssize_t;
 #define	MDB_NO_ROOT		(MDB_LAST_ERRCODE + 10)
 #ifdef _WIN32
 #define MDB_OWNERDEAD	((int) WAIT_ABANDONED)
+#elif defined MDB_USE_SYSV_SEM
+#define MDB_OWNERDEAD	(MDB_LAST_ERRCODE + 11)
 #elif defined(MDB_USE_POSIX_MUTEX) && defined(EOWNERDEAD)
 #define MDB_OWNERDEAD	EOWNERDEAD	/**< #LOCK_MUTEX0() result if dead owner */
 #endif
@@ -291,13 +303,14 @@ typedef SSIZE_T	ssize_t;
 /** Some platforms define the EOWNERDEAD error code
  * even though they don't support Robust Mutexes.
  * Compile with -DMDB_USE_ROBUST=0, or use some other
- * mechanism like -DMDB_USE_POSIX_SEM instead of
- * -DMDB_USE_POSIX_MUTEX.
- * (Posix semaphores are not robust.)
+ * mechanism like -DMDB_USE_SYSV_SEM instead of
+ * -DMDB_USE_POSIX_MUTEX. (SysV semaphores are
+ * also Robust, but some systems don't support them
+ * either.)
  */
 #ifndef MDB_USE_ROBUST
 /* Android currently lacks Robust Mutex support. So does glibc < 2.4. */
-# if defined(MDB_USE_POSIX_MUTEX) && (defined(ANDROID) || \
+# if defined(MDB_USE_POSIX_MUTEX) && (defined(__ANDROID__) || \
 	(defined(__GLIBC__) && GLIBC_VER < 0x020004))
 #  define MDB_USE_ROBUST	0
 # else
@@ -381,6 +394,40 @@ mdb_sem_wait(sem_t *sem)
    return rc;
 }
 
+#elif defined MDB_USE_SYSV_SEM
+
+typedef struct mdb_mutex {
+	int semid;
+	int semnum;
+	int *locked;
+} mdb_mutex_t[1], *mdb_mutexref_t;
+
+#define LOCK_MUTEX0(mutex)		mdb_sem_wait(mutex)
+#define UNLOCK_MUTEX(mutex)		do { \
+	struct sembuf sb = { 0, 1, SEM_UNDO }; \
+	sb.sem_num = (mutex)->semnum; \
+	*(mutex)->locked = 0; \
+	semop((mutex)->semid, &sb, 1); \
+} while(0)
+
+static int
+mdb_sem_wait(mdb_mutexref_t sem)
+{
+	int rc, *locked = sem->locked;
+	struct sembuf sb = { 0, -1, SEM_UNDO };
+	sb.sem_num = sem->semnum;
+	do {
+		if (!semop(sem->semid, &sb, 1)) {
+			rc = *locked ? MDB_OWNERDEAD : MDB_SUCCESS;
+			*locked = 1;
+			break;
+		}
+	} while ((rc = errno) == EINTR);
+	return rc;
+}
+
+#define mdb_mutex_consistent(mutex)	0
+
 #else	/* MDB_USE_POSIX_MUTEX: */
 	/** Shared mutex/semaphore as the original is stored.
 	 *
@@ -401,7 +448,7 @@ typedef pthread_mutex_t *mdb_mutexref_t;
 	/** Mark mutex-protected data as repaired, after death of previous owner.
 	 */
 #define mdb_mutex_consistent(mutex)	pthread_mutex_consistent(mutex)
-#endif	/* MDB_USE_POSIX_SEM */
+#endif	/* MDB_USE_POSIX_SEM || MDB_USE_SYSV_SEM */
 
 	/** Get the error code for the last failed system function.
 	 */
@@ -426,10 +473,23 @@ typedef pthread_mutex_t *mdb_mutexref_t;
 #define	GET_PAGESIZE(x)	((x) = sysconf(_SC_PAGE_SIZE))
 #endif
 
-#if defined(_WIN32) || defined(MDB_USE_POSIX_SEM)
-#define MNAME_LEN	32
+#define	Z	MDB_FMT_Z	/**< printf/scanf format modifier for size_t */
+#define	Yu	MDB_PRIy(u)	/**< printf format for #mdb_size_t */
+#define	Yd	MDB_PRIy(d)	/**< printf format for 'signed #mdb_size_t' */
+
+#ifdef MDB_USE_SYSV_SEM
+#define MNAME_LEN	(sizeof(int))
 #else
 #define MNAME_LEN	(sizeof(pthread_mutex_t))
+#endif
+
+/** Initial part of #MDB_env.me_mutexname[].
+ *	Changes to this code must be reflected in #MDB_LOCK_FORMAT.
+ */
+#ifdef _WIN32
+#define MUTEXNAME_PREFIX		"Global\\MDB"
+#elif defined MDB_USE_POSIX_SEM
+#define MUTEXNAME_PREFIX		"/MDB"
 #endif
 
 /** @} */
@@ -789,21 +849,27 @@ typedef struct MDB_txninfo {
 #define mti_magic	mt1.mtb.mtb_magic
 #define mti_format	mt1.mtb.mtb_format
 #define mti_rmutex	mt1.mtb.mtb_rmutex
-#define mti_rmname	mt1.mtb.mtb_rmname
 #define mti_txnid	mt1.mtb.mtb_txnid
 #define mti_numreaders	mt1.mtb.mtb_numreaders
+#define mti_mutexid	mt1.mtb.mtb_mutexid
+#ifdef MDB_USE_SYSV_SEM
+#define	mti_semid	mt1.mtb.mtb_semid
+#define	mti_rlocked	mt1.mtb.mtb_rlocked
+#endif
 		char pad[(sizeof(MDB_txbody)+CACHELINE-1) & ~(CACHELINE-1)];
 	} mt1;
+#if !(defined(_WIN32) || defined(MDB_USE_POSIX_SEM))
 	union {
-#if defined(_WIN32) || defined(MDB_USE_POSIX_SEM)
-		char mt2_wmname[MNAME_LEN];
-#define	mti_wmname	mt2.mt2_wmname
+#ifdef MDB_USE_SYSV_SEM
+		int mt2_wlocked;
+#define mti_wlocked	mt2.mt2_wlocked
 #else
 		mdb_mutex_t	mt2_wmutex;
 #define mti_wmutex	mt2.mt2_wmutex
 #endif
 		char pad[(MNAME_LEN+CACHELINE-1) & ~(CACHELINE-1)];
 	} mt2;
+#endif
 	MDB_reader	mti_readers[1];
 } MDB_txninfo;
 
@@ -3995,6 +4061,9 @@ mdb_env_create(MDB_env **env)
 #ifdef MDB_USE_POSIX_SEM
 	e->me_rmutex = SEM_FAILED;
 	e->me_wmutex = SEM_FAILED;
+#elif defined MDB_USE_SYSV_SEM
+	e->me_rmutex->semid = -1;
+	e->me_wmutex->semid = -1;
 #endif
 	e->me_pid = getpid();
 	GET_PAGESIZE(e->me_os_psize);
@@ -4779,6 +4848,10 @@ mdb_env_setup_locks(MDB_env *env, MDB_name *fname, int mode, int *excl)
 #else
 #	define MDB_ERRCODE_ROFS	EROFS
 #endif
+#ifdef MDB_USE_SYSV_SEM
+	int semid;
+	union semun semu;
+#endif
 	int rc;
 	off_t size, rsize;
 
@@ -4914,6 +4987,20 @@ mdb_env_setup_locks(MDB_env *env, MDB_name *fname, int mode, int *excl)
 		env->me_wmutex = sem_open(env->me_txns->mti_wmname,
 			O_CREAT|O_EXCL, mode, 1);
 		if (env->me_wmutex == SEM_FAILED) goto fail_errno;
+#elif defined(MDB_USE_SYSV_SEM)
+		unsigned short vals[2] = {1, 1};
+		key_t key = ftok(fname->mn_val, 'M'); /* fname is lockfile path now */
+		if (key == -1)
+			goto fail_errno;
+		semid = semget(key, 2, (mode & 0777) | IPC_CREAT);
+		if (semid < 0)
+			goto fail_errno;
+		semu.array = vals;
+		if (semctl(semid, 0, SETALL, semu) < 0)
+			goto fail_errno;
+		env->me_txns->mti_semid = semid;
+		env->me_txns->mti_rlocked = 0;
+		env->me_txns->mti_wlocked = 0;
 #else	/* MDB_USE_POSIX_MUTEX: */
 		pthread_mutexattr_t mattr;
 
@@ -4944,6 +5031,9 @@ mdb_env_setup_locks(MDB_env *env, MDB_name *fname, int mode, int *excl)
 		env->me_txns->mti_numreaders = 0;
 
 	} else {
+#ifdef MDB_USE_SYSV_SEM
+		struct semid_ds buf;
+#endif
 		if (env->me_txns->mti_magic != MDB_MAGIC) {
 			DPUTS("lock region has invalid magic");
 			rc = MDB_INVALID;
@@ -4969,8 +5059,26 @@ mdb_env_setup_locks(MDB_env *env, MDB_name *fname, int mode, int *excl)
 		if (env->me_rmutex == SEM_FAILED) goto fail_errno;
 		env->me_wmutex = sem_open(env->me_txns->mti_wmname, 0);
 		if (env->me_wmutex == SEM_FAILED) goto fail_errno;
+#elif defined(MDB_USE_SYSV_SEM)
+		semid = env->me_txns->mti_semid;
+		semu.buf = &buf;
+		/* check for read access */
+		if (semctl(semid, 0, IPC_STAT, semu) < 0)
+			goto fail_errno;
+		/* check for write access */
+		if (semctl(semid, 0, IPC_SET, semu) < 0)
+			goto fail_errno;
 #endif
 	}
+#ifdef MDB_USE_SYSV_SEM
+	env->me_rmutex->semid = semid;
+	env->me_wmutex->semid = semid;
+	env->me_rmutex->semnum = 0;
+	env->me_wmutex->semnum = 1;
+	env->me_rmutex->locked = &env->me_txns->mti_rlocked;
+	env->me_wmutex->locked = &env->me_txns->mti_wlocked;
+#endif
+
 	return MDB_SUCCESS;
 
 fail_errno:
@@ -5169,6 +5277,16 @@ mdb_env_close0(MDB_env *env, int excl)
 				sem_unlink(env->me_txns->mti_rmname);
 				sem_unlink(env->me_txns->mti_wmname);
 			}
+		}
+#elif defined(MDB_USE_SYSV_SEM)
+		if (env->me_rmutex->semid != -1) {
+			/* If we have the filelock:  If we are the
+			 * only remaining user, clean up semaphores.
+			 */
+			if (excl == 0)
+				mdb_env_excl_lock(env, &excl);
+			if (excl > 0)
+				semctl(env->me_rmutex->semid, 0, IPC_RMID);
 		}
 #endif
 		munmap((void *)env->me_txns, (env->me_maxreaders-1)*sizeof(MDB_reader)+sizeof(MDB_txninfo));
