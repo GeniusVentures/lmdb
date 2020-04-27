@@ -1701,6 +1701,7 @@ static char *const mdb_errstr[] = {
 	"MDB_BAD_TXN: Transaction must abort, has a child, or is invalid",
 	"MDB_BAD_VALSIZE: Unsupported size of key/DB name/data, or wrong DUPFIXED size",
 	"MDB_BAD_DBI: The specified DBI handle was closed/changed unexpectedly",
+	"MDB_PROBLEM: Unexpected problem - txn should abort",
 };
 
 char *
@@ -2144,7 +2145,7 @@ mdb_page_loose(MDB_cursor *mc, MDB_page *mp)
 					if (mp != dl[x].mptr) { /* bad cursor? */
 						mc->mc_flags &= ~(C_INITIALIZED|C_EOF);
 						txn->mt_flags |= MDB_TXN_ERROR;
-						return MDB_CORRUPTED;
+						return MDB_PROBLEM;
 					}
 					/* ok, it's ours */
 					loose = 1;
@@ -2756,7 +2757,7 @@ mdb_page_touch(MDB_cursor *mc)
 				if (mp != dl[x].mptr) { /* bad cursor? */
 					mc->mc_flags &= ~(C_INITIALIZED|C_EOF);
 					txn->mt_flags |= MDB_TXN_ERROR;
-					return MDB_CORRUPTED;
+					return MDB_PROBLEM;
 				}
 				return 0;
 			}
@@ -6700,7 +6701,7 @@ mdb_ovpage_free(MDB_cursor *mc, MDB_page *mp)
 				j = ++(dl[0].mid);
 				dl[j] = ix;		/* Unsorted. OK when MDB_TXN_ERROR. */
 				txn->mt_flags |= MDB_TXN_ERROR;
-				return MDB_CORRUPTED;
+				return MDB_PROBLEM;
 			}
 		}
 		txn->mt_dirty_room++;
@@ -8067,7 +8068,7 @@ put_sub:
 		return rc;
 bad_sub:
 		if (rc == MDB_KEYEXIST)	/* should not happen, we deleted that item */
-			rc = MDB_CORRUPTED;
+			rc = MDB_PROBLEM;
 	}
 	mc->mc_txn->mt_flags |= MDB_TXN_ERROR;
 	return rc;
