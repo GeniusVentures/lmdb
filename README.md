@@ -31,14 +31,15 @@ Or you can use following commands.
 To build android static library using CMake , please input following commands.
 
 	git clone https://gitlab.geniusventures.io:8486/GeniusVentures/lmdb
-	cd lmdb
+	cd lmdb/libraries/liblmdb
 	mkdir build-android
 	cd build-android
 	cmake .. -DCMAKE_SYSTEM_NAME=Android -DCMAKE_SYSTEM_VERSION=21 -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a  -DCMAKE_ANDROID_NDK=/home/ubuntu/android-ndk-r21b -DCMAKE_ANDROID_STL_TYPE=c++_static
 	make
 
 if build is succeed, you can verify liblmdb.a in build-android folder.
-## iOS build (on MacOS 18.04 )
+## iOS build (on MacOS 10.14.4 )
+
 	
 	 
 	 
