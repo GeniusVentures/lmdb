@@ -1,0 +1,673 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXAggregateTarget section */
+		0FEA0AC766F044229B6A013F /* ZERO_CHECK */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = CA44B816DFE149E8844DF0E4 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */;
+			buildPhases = (
+				1787983ECC794F598EAF3D11 /* CMake Rules */,
+			);
+			dependencies = (
+			);
+			name = ZERO_CHECK;
+			productName = ZERO_CHECK;
+		};
+		5280DB70C1994D0C9ACDD35E /* ALL_BUILD */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = A9A7B04CE6304E3996D84E43 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */;
+			buildPhases = (
+				4571C007C7E442EA95FBF212 /* CMake Rules */,
+			);
+			dependencies = (
+				7ACF4CCBEC304A0590E5AA82 /* PBXTargetDependency */,
+				F67A736BC26B44C2B6C69B29 /* PBXTargetDependency */,
+			);
+			name = ALL_BUILD;
+			productName = ALL_BUILD;
+		};
+/* End PBXAggregateTarget section */
+
+/* Begin PBXBuildFile section */
+		0704C6447A5F4F7C842DB0FE /* /Users/bin/lmdb/libraries/liblmdb/midl.c */ = {isa = PBXBuildFile; fileRef = 4512F2FB78D04E70B7EB441A /* /Users/bin/lmdb/libraries/liblmdb/midl.c */; };
+		4F7B74D2ECFF4D168EF155F3 /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */ = {isa = PBXBuildFile; fileRef = 573D8E954FFC4E75B140E68F /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */; };
+		7F4F9AF50D2D4399922B0788 /* /Users/bin/lmdb/libraries/liblmdb/mdb.c */ = {isa = PBXBuildFile; fileRef = 101AC3F8697046AB857BEC47 /* /Users/bin/lmdb/libraries/liblmdb/mdb.c */; };
+		E0F54FA7131F4567928E9107 /* /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/lmdb.dir/Info.plist */ = {isa = PBXBuildFile; fileRef = ADD6CB154E5E4822B1F0E7AA /* /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/lmdb.dir/Info.plist */; };
+		E4A0599414554C17A458BAD5 /* /Users/bin/lmdb/libraries/liblmdb/lmdb.h */ = {isa = PBXBuildFile; fileRef = 84329AED798F4833A0F91FCA /* /Users/bin/lmdb/libraries/liblmdb/lmdb.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		857420A8CDB448B4A73E1EEF /* MinSizeRel */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = MinSizeRel;
+		};
+		A90BB485234B418F928BB1CB /* Release */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Release;
+		};
+		CFD92A0F83E84F64A97A8E1E /* Debug */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		D69DB96D0DD34B3684DE73E9 /* RelWithDebInfo */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = RelWithDebInfo;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXContainerItemProxy section */
+		61DB3908C538438FB52D410C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28C9CF8BED7E4336A1DA2D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0FEA0AC766F044229B6A013F;
+			remoteInfo = ZERO_CHECK;
+		};
+		DDC1C4619B03409E8F9C9F7D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28C9CF8BED7E4336A1DA2D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B413225E3A0C47A885961D5A;
+			remoteInfo = lmdb;
+		};
+		EDE912FBD27F4402ACAABEC9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28C9CF8BED7E4336A1DA2D7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0FEA0AC766F044229B6A013F;
+			remoteInfo = ZERO_CHECK;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		101AC3F8697046AB857BEC47 /* /Users/bin/lmdb/libraries/liblmdb/mdb.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = mdb.c; path = mdb.c; sourceTree = SOURCE_ROOT; };
+		16FC67430CBB4597982837E0 /* lmdb */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = liblmdb.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		4512F2FB78D04E70B7EB441A /* /Users/bin/lmdb/libraries/liblmdb/midl.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 4; name = midl.c; path = midl.c; sourceTree = SOURCE_ROOT; };
+		573D8E954FFC4E75B140E68F /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		84329AED798F4833A0F91FCA /* /Users/bin/lmdb/libraries/liblmdb/lmdb.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 4; name = lmdb.h; path = lmdb.h; sourceTree = SOURCE_ROOT; };
+		A03DC603426A4F9DA04F251E /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */ = {isa = PBXFileReference; explicitFileType = sourcecode.text; fileEncoding = 4; name = CMakeLists.txt; path = CMakeLists.txt; sourceTree = SOURCE_ROOT; };
+		ADD6CB154E5E4822B1F0E7AA /* /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/lmdb.dir/Info.plist */ = {isa = PBXFileReference; explicitFileType = sourcecode.text.plist; fileEncoding = 4; name = Info.plist; path = "build-ios/_builds/CMakeFiles/lmdb.dir/Info.plist"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		17E5E00A3DBE47308AB96D44 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ADD6CB154E5E4822B1F0E7AA /* /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/lmdb.dir/Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		276F0ABB498C4B3E953E5E05 /* ALL_BUILD */ = {
+			isa = PBXGroup;
+			children = (
+				F5DC979664DB48C7B9333305 /* CMake Rules */,
+				A03DC603426A4F9DA04F251E /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */,
+			);
+			name = ALL_BUILD;
+			sourceTree = "<group>";
+		};
+		66360305491F4F3ABAB00B58 = {
+			isa = PBXGroup;
+			children = (
+				DB7CA2B17534444C82028616 /* lmdb */,
+				276F0ABB498C4B3E953E5E05 /* ALL_BUILD */,
+				E9E7F483D6934E77819B5E87 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		831F6C27384E46EC8029A778 /* Header Files */ = {
+			isa = PBXGroup;
+			children = (
+				84329AED798F4833A0F91FCA /* /Users/bin/lmdb/libraries/liblmdb/lmdb.h */,
+			);
+			name = "Header Files";
+			sourceTree = "<group>";
+		};
+		BFFEFC8746584A4788CC7830 /* Source Files */ = {
+			isa = PBXGroup;
+			children = (
+				101AC3F8697046AB857BEC47 /* /Users/bin/lmdb/libraries/liblmdb/mdb.c */,
+				4512F2FB78D04E70B7EB441A /* /Users/bin/lmdb/libraries/liblmdb/midl.c */,
+			);
+			name = "Source Files";
+			sourceTree = "<group>";
+		};
+		DB7CA2B17534444C82028616 /* lmdb */ = {
+			isa = PBXGroup;
+			children = (
+				831F6C27384E46EC8029A778 /* Header Files */,
+				BFFEFC8746584A4788CC7830 /* Source Files */,
+				17E5E00A3DBE47308AB96D44 /* Resources */,
+				573D8E954FFC4E75B140E68F /* /Users/bin/lmdb/libraries/liblmdb/CMakeLists.txt */,
+			);
+			name = lmdb;
+			sourceTree = "<group>";
+		};
+		E9E7F483D6934E77819B5E87 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				16FC67430CBB4597982837E0 /* lmdb */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F5DC979664DB48C7B9333305 /* CMake Rules */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "CMake Rules";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B413225E3A0C47A885961D5A /* lmdb */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0865CA3188C4F04888EAE1A /* Build configuration list for PBXNativeTarget "lmdb" */;
+			buildPhases = (
+				EDEACFF03B594803839B868D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				392E64DAEA14470092162DE1 /* PBXTargetDependency */,
+			);
+			name = lmdb;
+			productName = lmdb;
+			productReference = 16FC67430CBB4597982837E0 /* lmdb */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		28C9CF8BED7E4336A1DA2D7A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1120;
+			};
+			buildConfigurationList = 89676832A63A4573B5096DBC /* Build configuration list for PBXProject "Project" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				CFD92A0F83E84F64A97A8E1E /* Debug */,
+				A90BB485234B418F928BB1CB /* Release */,
+				857420A8CDB448B4A73E1EEF /* MinSizeRel */,
+				D69DB96D0DD34B3684DE73E9 /* RelWithDebInfo */,
+			);
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 0;
+			mainGroup = 66360305491F4F3ABAB00B58;
+			projectDirPath = ../../;
+			projectRoot = "";
+			targets = (
+				5280DB70C1994D0C9ACDD35E /* ALL_BUILD */,
+				0FEA0AC766F044229B6A013F /* ZERO_CHECK */,
+				B413225E3A0C47A885961D5A /* lmdb */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1787983ECC794F598EAF3D11 /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds -f /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeScripts/ZERO_CHECK_cmakeRulesBuildPhase.make$CONFIGURATION OBJDIR=$(basename \"$OBJECT_FILE_DIR_normal\") all";
+			showEnvVarsInLog = 0;
+		};
+		4571C007C7E442EA95FBF212 /* CMake Rules */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			name = "CMake Rules";
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds -f /Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeScripts/ALL_BUILD_cmakeRulesBuildPhase.make$CONFIGURATION OBJDIR=$(basename \"$OBJECT_FILE_DIR_normal\") all";
+			showEnvVarsInLog = 0;
+		};
+		BB24AFB54920433D80D99A07 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+		EF05D9C4C8B3445A97FA78F9 = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# shell script goes here
+exit 0";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		EDEACFF03B594803839B868D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F4F9AF50D2D4399922B0788 /* /Users/bin/lmdb/libraries/liblmdb/mdb.c */,
+				0704C6447A5F4F7C842DB0FE /* /Users/bin/lmdb/libraries/liblmdb/midl.c */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		392E64DAEA14470092162DE1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0FEA0AC766F044229B6A013F /* ZERO_CHECK */;
+			targetProxy = 61DB3908C538438FB52D410C /* PBXContainerItemProxy */;
+		};
+		7ACF4CCBEC304A0590E5AA82 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0FEA0AC766F044229B6A013F /* ZERO_CHECK */;
+			targetProxy = EDE912FBD27F4402ACAABEC9 /* PBXContainerItemProxy */;
+		};
+		F67A736BC26B44C2B6C69B29 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B413225E3A0C47A885961D5A /* lmdb */;
+			targetProxy = DDC1C4619B03409E8F9C9F7D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1AE47319BD6140CD86A7917A /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		2ACA21C9105D46B3BF2131E4 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "armv7 armv7s arm64 i386 x86_64";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/build";
+			};
+			name = RelWithDebInfo;
+		};
+		2B09BDA79BD94F35A397E743 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		317CB692317344FA8EC1B7DF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		377DED8DDE51444CBCF32593 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "armv7 armv7s arm64 i386 x86_64";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/build";
+			};
+			name = MinSizeRel;
+		};
+		3A2B090CCDBF4F29AF235E69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		53C214C7DC2440EFAE32E963 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+		57E3D5C7DC9E42D9963CB91C /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		5B85FF04CEEB4AFCBF662DFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (armv7,armv7s,arm64,i386,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_LIBTOOLFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = lmdb;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Release;
+		};
+		6E70B1FE21194DEBB347EB8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "armv7 armv7s arm64 i386 x86_64";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/build";
+			};
+			name = Release;
+		};
+		79EC22BEFFBC40CDA48E977F /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (armv7,armv7s,arm64,i386,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 2;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "       -DNDEBUG  ";
+				OTHER_LIBTOOLFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = lmdb;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		8CD59C25C1F84B5C9E9D67BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (armv7,armv7s,arm64,i386,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "    ";
+				OTHER_LIBTOOLFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = lmdb;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		9879F31B777B46D081D47C32 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ZERO_CHECK;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = Debug;
+		};
+		BAD0A7FE9D3E47ACBD1E91BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "armv7 armv7s arm64 i386 x86_64";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				ONLY_ACTIVE_ARCH = NO;
+				SDKROOT = iphoneos;
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/build";
+			};
+			name = Debug;
+		};
+		D6D59337B75E4D9D94A63143 /* RelWithDebInfo */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				OTHER_LDFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ALL_BUILD;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = RelWithDebInfo;
+		};
+		E44E7B4162A246AB8C841564 /* MinSizeRel */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (armv7,armv7s,arm64,i386,x86_64);
+				COMBINE_HIDPI_IMAGES = YES;
+				EXECUTABLE_PREFIX = lib;
+				EXECUTABLE_SUFFIX = .a;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_PREPROCESSOR_DEFINITIONS = ("'CMAKE_INTDIR=\"$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"'");
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				INSTALL_PATH = "";
+				LIBRARY_STYLE = STATIC;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "    -DNDEBUG  ";
+				OTHER_LIBTOOLFLAGS = " ";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = lmdb;
+				SECTORDER_FLAGS = "";
+				SYMROOT = "/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds";
+				USE_HEADERMAP = NO;
+				WARNING_CFLAGS = ("$(inherited)");
+			};
+			name = MinSizeRel;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		89676832A63A4573B5096DBC /* Build configuration list for PBXProject "Project" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BAD0A7FE9D3E47ACBD1E91BC /* Debug */,
+				6E70B1FE21194DEBB347EB8F /* Release */,
+				377DED8DDE51444CBCF32593 /* MinSizeRel */,
+				2ACA21C9105D46B3BF2131E4 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A0865CA3188C4F04888EAE1A /* Build configuration list for PBXNativeTarget "lmdb" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CD59C25C1F84B5C9E9D67BD /* Debug */,
+				5B85FF04CEEB4AFCBF662DFB /* Release */,
+				E44E7B4162A246AB8C841564 /* MinSizeRel */,
+				79EC22BEFFBC40CDA48E977F /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		A9A7B04CE6304E3996D84E43 /* Build configuration list for PBXAggregateTarget "ALL_BUILD" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				317CB692317344FA8EC1B7DF /* Debug */,
+				2B09BDA79BD94F35A397E743 /* Release */,
+				53C214C7DC2440EFAE32E963 /* MinSizeRel */,
+				D6D59337B75E4D9D94A63143 /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CA44B816DFE149E8844DF0E4 /* Build configuration list for PBXAggregateTarget "ZERO_CHECK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9879F31B777B46D081D47C32 /* Debug */,
+				3A2B090CCDBF4F29AF235E69 /* Release */,
+				1AE47319BD6140CD86A7917A /* MinSizeRel */,
+				57E3D5C7DC9E42D9963CB91C /* RelWithDebInfo */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 28C9CF8BED7E4336A1DA2D7A /* Project object */;
+}

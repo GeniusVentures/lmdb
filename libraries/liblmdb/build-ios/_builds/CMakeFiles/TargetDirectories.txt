@@ -1,0 +1,3 @@
+/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/lmdb.dir
+/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/ALL_BUILD.dir
+/Users/bin/lmdb/libraries/liblmdb/build-ios/_builds/CMakeFiles/ZERO_CHECK.dir
