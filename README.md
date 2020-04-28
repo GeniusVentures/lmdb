@@ -6,7 +6,7 @@ Cmake 3.4+ version is needed.
 You have to install cmake 3.15.x+ version to compile for android.
 I used CMake 3.17.1. If you have already installed cmake old version of CMake, Please remove it first using following command.
 ```shell
-apt purge cmake
+$ apt purge cmake
 ```		
 To install CMake 3.17.1, you can input following commands on terminal.
 	
