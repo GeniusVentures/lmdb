@@ -1,8 +1,8 @@
-## a project for lmdb code from OpenLDAP
-# Windows Build ( On Windows 10)
+# a project for lmdb code from OpenLDAP
+## Windows Build ( On Windows 10)
 we can use CMake-Gui to config and generate visual studio project for windows build.
 Cmake 3.4+ version is needed.
-# Android build (on Ubuntu 18.04 )
+## Android build (on Ubuntu 18.04 )
 You have to install cmake 3.15.x+ version to compile for android.
 I used CMake 3.17.1. If you have already installed cmake old version of CMake, Please remove it first using following command.
 
