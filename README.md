@@ -10,14 +10,9 @@ I used CMake 3.17.1. If you have already installed cmake old version of CMake, P
 	
 To install CMake 3.17.1, you can input following commands on terminal.
 	
-	wget https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1.tar.gz
-	tar -zxvf cmake-3.17.1.tar.gz
-	cd cmake-3.17.1
-	./bootstrap
-	make
-	sudo make install
+	apt install cmake
 	
-To confirm installation of cmake, you ahve to close and reopen terminal again and input following commands.
+To confirm installation of cmake, you have to close and reopen terminal again and input following commands.
 	
 	cmake --version
 	
@@ -39,6 +34,28 @@ To build android static library using CMake , please input following commands.
 
 if build is succeed, you can verify liblmdb.a in build-android folder.
 ## iOS build (on MacOS 10.14.4 )
+You have to install [xcode and brew](https://www.moncefbelyamani.com/how-to-install-xcode-homebrew-git-rvm-ruby-on-mac/) first.
+please install cmake using following commands:
+```shell
+brew install cmake
+```
+To confirm installation of cmake, you have to close and reopen terminal again and input following commands.
+```shell
+cmake --version
+```
+please verify you installed cmake 3.15.x+ version.
+To build iOS static library using CMake , please input following commands:
+```shell
+	git clone https://gitlab.geniusventures.io:8486/GeniusVentures/lmdb
+	cd lmdb/libraries/liblmdb
+	mkdir build-ios
+	cd build-ios
+	$ cmake -S. -B_builds -GXcode -DCMAKE_SYSTEM_NAME=iOS "-DCMAKE_OSX_ARCHITECTURES=armv7;armv7s;arm64;i386;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=9.3 -DCMAKE_INSTALL_PREFIX=`pwd`/_install -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO -DCMAKE_IOS_INSTALL_COMBINED=YES
+```
+Then you can find the xcode project is generated in "build-ios/_build" subfolder.
+Please open the proejct in xcode and compile.
+
+
 
 	
 	 
