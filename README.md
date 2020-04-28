@@ -25,8 +25,8 @@ Next, you have to install android ndk ( I used [Android-NDK-r21b](https://dl.goo
 Please download using this url and extract it. 
 Or you can use following commands.
 
-	curl -L -o android-ndk-$NDK_VERSION-linux-x86_64.zip https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
-	unzip android-ndk-$NDK_VERSION-linux-x86_64.zip
+	curl -L -o android-ndk-r21b-linux-x86_64.zip https://dl.google.com/android/repository/android-ndk-r21b-linux-x86_64.zip
+	unzip android-ndk-r21b-linux-x86_64.zip
 
 To build android static library using CMake , please input following commands.
 
@@ -38,7 +38,7 @@ To build android static library using CMake , please input following commands.
 	make
 
 if build is succeed, you can verify liblmdb.a in build-android folder.
-
+## iOS build (on MacOS 18.04 )
 	
 	 
 	 
