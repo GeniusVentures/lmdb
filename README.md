@@ -48,11 +48,9 @@ To build iOS static library using CMake , please input following commands:
 ```shell
 	git clone https://gitlab.geniusventures.io:8486/GeniusVentures/lmdb
 	cd lmdb/libraries/liblmdb
-	mkdir build-ios
-	cd build-ios
-	$ cmake -S. -B_builds -GXcode -DCMAKE_SYSTEM_NAME=iOS "-DCMAKE_OSX_ARCHITECTURES=armv7;armv7s;arm64;i386;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=9.3 -DCMAKE_INSTALL_PREFIX=`pwd`/_install -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO -DCMAKE_IOS_INSTALL_COMBINED=YES
+	$ cmake -S. -Bbuild-ios -GXcode -DCMAKE_SYSTEM_NAME=iOS "-DCMAKE_OSX_ARCHITECTURES=armv7;armv7s;arm64;i386;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=9.3 -DCMAKE_INSTALL_PREFIX=`pwd`/_install -DCMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH=NO -DCMAKE_IOS_INSTALL_COMBINED=YES 
 ```
-Then you can find the xcode project is generated in "build-ios/_build" subfolder.
+Then you can find the xcode project is generated in "build-ios" subfolder.
 Please open the proejct in xcode and compile.
 
 
