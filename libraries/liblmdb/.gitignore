@@ -21,3 +21,6 @@ core.*
 valgrind.*
 man/
 html/
+android-build/
+build/
+build-ios/
